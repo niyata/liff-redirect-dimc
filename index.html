@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>LIFF Redirect Portal</title>
+  <script src="https://static.line-scdn.net/liff/edge/2/sdk.js"></script>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <style>
+    body { font-family: Arial, sans-serif; margin: 1rem; background: #f5f5f5; }
+    h2 { color: #333; }
+    button { margin: 0.2rem; padding: 0.5rem 1rem; }
+    .link-card {
+      background: white;
+      border-radius: 0.5rem;
+      padding: 1rem;
+      margin-bottom: 1rem;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+    }
+    .modal {
+      position: fixed;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      background: rgba(0,0,0,0.5);
+      display: none;
+      justify-content: center;
+      align-items: center;
+    }
+    .modal-content {
+      background: white;
+      padding: 1rem;
+      border-radius: 0.5rem;
+      width: 90%; max-width: 400px;
+    }
+    label { display: block; margin-top: 0.5rem; }
+    input, textarea { width: 100%; padding: 0.4rem; margin-top: 0.2rem; }
+  </style>
+</head>
+<body>
+  <h2>🔗 Redirect Portal</h2>
+  <div id="link-list"></div>
+  <button onclick="showForm()">➕ เพิ่มลิงก์ใหม่</button>
+
+  <div class="modal" id="modal">
+    <div class="modal-content">
+      <h3 id="form-title">เพิ่มลิงก์</h3>
+      <input type="hidden" id="link-id">
+      <label>ชื่อ:</label>
+      <input type="text" id="link-title">
+      <label>URL:</label>
+      <input type="text" id="link-url">
+      <label>คำอธิบาย:</label>
+      <textarea id="link-description"></textarea>
+      <button onclick="submitForm()">💾 บันทึก</button>
+      <button onclick="closeForm()">❌ ยกเลิก</button>
+    </div>
+  </div>
+
+  <script>
+    const API_URL = 'YOUR_DEPLOYED_SCRIPT_URL'; // <= Replace this with your Apps Script Web App URL
+
+    async function init() {
+      await liff.init({ liffId: 'YOUR_LIFF_ID' }); // <= Replace with your LIFF ID
+      fetchLinks();
+    }
+
+    async function fetchLinks() {
+      const res = await fetch(`${API_URL}?action=list`);
+      const links = await res.json();
+      const container = document.getElementById('link-list');
+      container.innerHTML = '';
+      links.forEach(link => {
+        const div = document.createElement('div');
+        div.className = 'link-card';
+        div.innerHTML = `
+          <b>${link.Title}</b><br>
+          <small>${link.Description}</small><br>
+          <button onclick="openExternal('${link.URL}')">🌐 เปิดลิงก์</button>
+          <button onclick="editLink(${link.ID}, '${link.Title}', '${link.URL}', '${link.Description}')">✏️ แก้ไข</button>
+          <button onclick="deleteLink(${link.ID})">🗑️ ลบ</button>
+        `;
+        container.appendChild(div);
+      });
+    }
+
+    function openExternal(url) {
+      liff.openWindow({ url, external: true });
+    }
+
+    function showForm(id = null) {
+      document.getElementById('modal').style.display = 'flex';
+      if (!id) {
+        document.getElementById('form-title').textContent = 'เพิ่มลิงก์';
+        document.getElementById('link-id').value = '';
+        document.getElementById('link-title').value = '';
+        document.getElementById('link-url').value = '';
+        document.getElementById('link-description').value = '';
+      }
+    }
+
+    function closeForm() {
+      document.getElementById('modal').style.display = 'none';
+    }
+
+    function editLink(id, title, url, description) {
+      showForm(id);
+      document.getElementById('form-title').textContent = 'แก้ไขลิงก์';
+      document.getElementById('link-id').value = id;
+      document.getElementById('link-title').value = title;
+      document.getElementById('link-url').value = url;
+      document.getElementById('link-description').value = description;
+    }
+
+    async function submitForm() {
+      const id = document.getElementById('link-id').value;
+      const title = document.getElementById('link-title').value;
+      const url = document.getElementById('link-url').value;
+      const description = document.getElementById('link-description').value;
+
+      const payload = {
+        action: id ? 'update' : 'create',
+        id: Number(id),
+        title,
+        url,
+        description
+      };
+
+      await fetch(API_URL, {
+        method: 'POST',
+        body: JSON.stringify(payload),
+        headers: { 'Content-Type': 'application/json' }
+      });
+
+      closeForm();
+      fetchLinks();
+    }
+
+    async function deleteLink(id) {
+      if (!confirm('คุณแน่ใจว่าต้องการลบลิงก์นี้?')) return;
+      await fetch(API_URL, {
+        method: 'POST',
+        body: JSON.stringify({ action: 'delete', id }),
+        headers: { 'Content-Type': 'application/json' }
+      });
+      fetchLinks();
+    }
+
+    init();
+  </script>
+</body>
+</html>
