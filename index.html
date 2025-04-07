@@ -1,0 +1,25 @@
+
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8" />
+  <title>LIFF Redirect Portal</title>
+</head>
+<body>
+  <h1>🔗 My Redirect Portal (Xata)</h1>
+  <ul id="link-list"></ul>
+  <script src="env.js"></script>
+  <script>
+    fetch("/.netlify/functions/list")
+      .then(res => res.json())
+      .then(data => {
+        const list = document.getElementById("link-list");
+        data.forEach(item => {
+          const li = document.createElement("li");
+          li.textContent = `${item.name}: ${item.url}`;
+          list.appendChild(li);
+        });
+      });
+  </script>
+</body>
+</html>
