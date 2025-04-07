@@ -1,4 +1,4 @@
 window.ENV = {
   LIFF_ID: '1656178796-37apgwOv',
-  API_URL: 'https://script.google.com/macros/s/AKfycbzBq_jmSw4t7PYI9A0monwiDVyEvT3cGCbbVoP5ijNl3mIk9zXrlbzYdUXscvChryACBA/exec'
+  API_URL: 'https://script.google.com/macros/s/AKfycbwX6nCzIVbczSJPpA6jjpRHiirL8NVuoVd3tOral0C_JrzmSRkH6-nicCCBlqXH4hEWjg/exec'
 };
