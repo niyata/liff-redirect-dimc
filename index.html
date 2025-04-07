@@ -4,6 +4,7 @@
   <meta charset="UTF-8">
   <title>LIFF Redirect Portal</title>
   <script src="https://static.line-scdn.net/liff/edge/2/sdk.js"></script>
+  <script src="env.js"></script> <!-- 🔑 โหลดค่าจากไฟล์ config -->
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <style>
     body { font-family: Arial, sans-serif; margin: 1rem; background: #f5f5f5; }
@@ -56,10 +57,10 @@
   </div>
 
   <script>
-    const API_URL = 'https://script.google.com/macros/s/AKfycbykWc2UFzee_v-YoFQsjfNKgL3Wgtwf188WjN7XwbhQt8QaoK0Ie4vHk4x_dfjd336eLQ/exec'; // <= Replace this with your Apps Script Web App URL
+    const API_URL = window.ENV.API_URL;
 
     async function init() {
-      await liff.init({ liffId: '1656178796-37apgwOv' }); // <= Replace with your LIFF ID
+      await liff.init({ liffId: window.ENV.LIFF_ID });
       fetchLinks();
     }
 
