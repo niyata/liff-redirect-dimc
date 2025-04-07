@@ -18,8 +18,15 @@ exports.handler = async () => {
     };
   } catch (err) {
     return {
-      statusCode: 500,
-      body: JSON.stringify({ error: err.message, detail: err.response?.data })
-    };
+  statusCode: 500,
+  body: JSON.stringify({
+    error: err.message,
+    data: err.response?.data || "No response data",
+    full: err.toString()
+  })
+};
   }
 };
+
+
+
